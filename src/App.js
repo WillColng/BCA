@@ -1,6 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-
 class WongHalvesCounter {
   constructor(decks = 6) {
     this.decks = decks;
@@ -41,9 +38,6 @@ class WongHalvesCounter {
     };
   }
 }
-
-const counter = new WongHalvesCounter();
-
 const App = () => {
   const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
   const [dealerCards, setDealerCards] = useState([]);
