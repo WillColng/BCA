@@ -71,11 +71,15 @@ const App = () => {
 
   const addCard = (containerId, card) => {
     if (containerId.startsWith('player')) {
-      const index = parseInt(containerId.replace('player', ''), 10) - 1;
+      const parts = containerId.split('_');
+      const index = parseInt(parts[0].replace('player', ''), 10) - 1;
+      const splitIndex = parts.length > 1 ? parseInt(parts[1], 10) : null;
+
       const newInputs = playerInputs.map((input, i) => {
         if (i === index) {
-          if (input.splitCards.length > 0) {
-            return { ...input, splitCards: [...input.splitCards, [card]] };
+          if (splitIndex !== null) {
+            const newSplitCards = input.splitCards.map((split, j) => j === splitIndex ? [...split, card] : split);
+            return { ...input, splitCards: newSplitCards };
           }
           return { ...input, cards: [...input.cards, card] };
         }
@@ -160,6 +164,11 @@ const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSe
             {split.map((card, j) => (
               <span key={j} className="card">{card}</span>
             ))}
+            <div className="card-buttons">
+              {['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].map(card => (
+                <button key={card} onClick={() => addCard(`player${index}_${i}`, card)}>{card}</button>
+              ))}
+            </div>
           </div>
         ))}
       </div>
