@@ -50,15 +50,17 @@ body {
 }
 
 .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: wrap-reverse;
+    justify-content: flex-end;
     gap: 10px;
     width: 100%;
     margin-top: 60px;
-    direction: rtl;  /* Right to left direction */
+    direction: rtl; /* Ensures elements start from the right */
 }
 
 .grid-container > .form-group {
+    flex: 1 1 150px;
     direction: ltr; /* Ensures form content is left-to-right */
 }
 
