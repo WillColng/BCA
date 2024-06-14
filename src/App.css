@@ -51,12 +51,11 @@ body {
 
 .grid-container {
     display: flex;
-    flex-wrap: wrap-reverse;
+    flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 10px;
     width: 100%;
     margin-top: 60px;
-    direction: rtl; /* Ensures elements start from the right */
+    direction: rtl;  /* Right to left direction */
 }
 
 .grid-container > .form-group {
