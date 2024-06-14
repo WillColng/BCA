@@ -51,12 +51,8 @@ const App = () => {
   const [recommendation, setRecommendation] = useState('');
 
   useEffect(() => {
-    generatePlayerInputs();
-  }, []);
-
-  const generatePlayerInputs = () => {
-    // Already managed by state
-  };
+    updateAndDisplayCount();
+  }, [playerInputs, dealerCards]);
 
   const setPlayer = (index) => {
     const newInputs = playerInputs.map((input, i) => i === index ? { ...input, active: true } : input);
@@ -81,7 +77,6 @@ const App = () => {
     } else if (containerId === 'dealerCardContainer') {
       setDealerCards([...dealerCards, card]);
     }
-    updateAndDisplayCount();
   };
 
   const updateAndDisplayCount = () => {
@@ -100,6 +95,7 @@ const App = () => {
     setPlayerInputs(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
     setDealerCards([]);
     setRecommendation('');
+    counter.reset();
     updateAndDisplayCount();
   };
 
