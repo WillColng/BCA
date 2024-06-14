@@ -45,7 +45,7 @@ class WongHalvesCounter {
 const counter = new WongHalvesCounter();
 
 const App = () => {
-  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
+  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], splitCards: [], score: 0, active: false, mySeat: false })));
   const [dealerCards, setDealerCards] = useState([]);
   const [counts, setCounts] = useState(counter.getCurrentCount());
   const [recommendation, setRecommendation] = useState('');
@@ -60,7 +60,7 @@ const App = () => {
   };
 
   const deactivatePlayer = (index) => {
-    const newInputs = playerInputs.map((input, i) => i === index ? { cards: [], score: 0, active: false, mySeat: false } : input);
+    const newInputs = playerInputs.map((input, i) => i === index ? { cards: [], splitCards: [], score: 0, active: false, mySeat: false } : input);
     setPlayerInputs(newInputs);
   };
 
@@ -72,11 +72,29 @@ const App = () => {
   const addCard = (containerId, card) => {
     if (containerId.startsWith('player')) {
       const index = parseInt(containerId.replace('player', ''), 10) - 1;
-      const newInputs = playerInputs.map((input, i) => i === index ? { ...input, cards: [...input.cards, card] } : input);
+      const newInputs = playerInputs.map((input, i) => {
+        if (i === index) {
+          if (input.splitCards.length > 0) {
+            return { ...input, splitCards: [...input.splitCards, [card]] };
+          }
+          return { ...input, cards: [...input.cards, card] };
+        }
+        return input;
+      });
       setPlayerInputs(newInputs);
     } else if (containerId === 'dealerCardContainer') {
       setDealerCards([...dealerCards, card]);
     }
+  };
+
+  const splitCards = (index) => {
+    const newInputs = playerInputs.map((input, i) => {
+      if (i === index && input.cards.length === 2 && input.cards[0] === input.cards[1]) {
+        return { ...input, splitCards: [[input.cards[0]], [input.cards[1]]], cards: [] };
+      }
+      return input;
+    });
+    setPlayerInputs(newInputs);
   };
 
   const updateAndDisplayCount = () => {
@@ -84,6 +102,7 @@ const App = () => {
     playerInputs.forEach(input => {
       if (input.active) {
         counter.updateCount(input.cards);
+        input.splitCards.forEach(split => counter.updateCount(split));
       }
     });
     counter.updateCount(dealerCards);
@@ -92,7 +111,7 @@ const App = () => {
   };
 
   const startNewRound = () => {
-    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
+    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], splitCards: [], score: 0, active: false, mySeat: false })));
     setDealerCards([]);
     setRecommendation('');
   };
@@ -119,7 +138,7 @@ const App = () => {
       </div>
       <div id="playerInputs" className="grid-container">
         {playerInputs.map((input, index) => (
-          <PlayerInput key={index} index={index + 1} data={input} addCard={addCard} setPlayer={setPlayer} deactivatePlayer={deactivatePlayer} takeSeat={takeSeat} />
+          <PlayerInput key={index} index={index + 1} data={input} addCard={addCard} setPlayer={setPlayer} deactivatePlayer={deactivatePlayer} takeSeat={takeSeat} splitCards={splitCards} />
         ))}
       </div>
       <DealerSection dealerCards={dealerCards} addCard={addCard} />
@@ -128,13 +147,20 @@ const App = () => {
   );
 };
 
-const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSeat }) => {
+const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSeat, splitCards }) => {
   return (
     <div className={`form-group ${data.active ? 'active' : 'inactive'}`} id={`player${index}`}>
       <label htmlFor={`player${index}Cards`}>Player {index} Cards</label>
       <div id={`player${index}Cards`} className={`card-container ${data.active ? '' : 'hidden'}`}>
         {data.cards.map((card, i) => (
           <span key={i} className="card">{card}</span>
+        ))}
+        {data.splitCards.map((split, i) => (
+          <div key={i} className="split">
+            {split.map((card, j) => (
+              <span key={j} className="card">{card}</span>
+            ))}
+          </div>
         ))}
       </div>
       <p id={`player${index}Score`}>Score: {data.score}</p>
@@ -143,7 +169,11 @@ const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSe
           <button key={card} onClick={() => addCard(`player${index}Cards`, card)}>{card}</button>
         ))}
       </div>
-      <div id={`player${index}Split`} className={`split-container ${data.active ? '' : 'hidden'}`}></div>
+      <div id={`player${index}Split`} className={`split-container ${data.active ? '' : 'hidden'}`}>
+        {data.cards.length === 2 && data.cards[0] === data.cards[1] && (
+          <button type="button" className="btn split-btn" onClick={() => splitCards(index - 1)}>Split</button>
+        )}
+      </div>
       {!data.active && !data.mySeat && <button type="button" className="btn set-player-btn" onClick={() => setPlayer(index - 1)}>Set Player</button>}
       {data.active && (
         <>
