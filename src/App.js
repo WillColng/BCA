@@ -45,7 +45,7 @@ class WongHalvesCounter {
 const counter = new WongHalvesCounter();
 
 const App = () => {
-  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], score: 0, active: false })));
+  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
   const [dealerCards, setDealerCards] = useState([]);
   const [counts, setCounts] = useState(counter.getCurrentCount());
   const [recommendation, setRecommendation] = useState('');
@@ -60,6 +60,16 @@ const App = () => {
 
   const setPlayer = (index) => {
     const newInputs = playerInputs.map((input, i) => i === index ? { ...input, active: true } : input);
+    setPlayerInputs(newInputs);
+  };
+
+  const deactivatePlayer = (index) => {
+    const newInputs = playerInputs.map((input, i) => i === index ? { cards: [], score: 0, active: false, mySeat: false } : input);
+    setPlayerInputs(newInputs);
+  };
+
+  const takeSeat = (index) => {
+    const newInputs = playerInputs.map((input, i) => i === index ? { ...input, mySeat: true } : input);
     setPlayerInputs(newInputs);
   };
 
@@ -87,7 +97,7 @@ const App = () => {
   };
 
   const startNewRound = () => {
-    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], score: 0, active: false })));
+    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
     setDealerCards([]);
     setRecommendation('');
     updateAndDisplayCount();
@@ -115,7 +125,7 @@ const App = () => {
       </div>
       <div id="playerInputs" className="grid-container">
         {playerInputs.map((input, index) => (
-          <PlayerInput key={index} index={index + 1} data={input} addCard={addCard} setPlayer={setPlayer} />
+          <PlayerInput key={index} index={index + 1} data={input} addCard={addCard} setPlayer={setPlayer} deactivatePlayer={deactivatePlayer} takeSeat={takeSeat} />
         ))}
       </div>
       <DealerSection dealerCards={dealerCards} addCard={addCard} />
@@ -124,7 +134,7 @@ const App = () => {
   );
 };
 
-const PlayerInput = ({ index, data, addCard, setPlayer }) => {
+const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSeat }) => {
   return (
     <div className={`form-group ${data.active ? 'active' : 'inactive'}`} id={`player${index}`}>
       <label htmlFor={`player${index}Cards`}>Player {index} Cards</label>
@@ -140,7 +150,14 @@ const PlayerInput = ({ index, data, addCard, setPlayer }) => {
         ))}
       </div>
       <div id={`player${index}Split`} className={`split-container ${data.active ? '' : 'hidden'}`}></div>
-      <button type="button" className="btn set-player-btn" onClick={() => setPlayer(index - 1)}>Set Player</button>
+      {!data.active && !data.mySeat && <button type="button" className="btn set-player-btn" onClick={() => setPlayer(index - 1)}>Set Player</button>}
+      {data.active && !data.mySeat && (
+        <>
+          <button type="button" className="btn deactivate-btn" onClick={() => deactivatePlayer(index - 1)}>Deactivate</button>
+          <button type="button" className="btn take-seat-btn" onClick={() => takeSeat(index - 1)}>Take Seat</button>
+        </>
+      )}
+      {data.mySeat && <p className="my-seat">My Seat</p>}
     </div>
   );
 };

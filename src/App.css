@@ -122,6 +122,11 @@ button:hover {
     display: none;
 }
 
+.my-seat {
+    color: #f1c40f;
+    font-weight: bold;
+}
+
 @media (max-width: 768px) {
     #app {
         padding: 10px;
