@@ -45,7 +45,7 @@ class WongHalvesCounter {
 const counter = new WongHalvesCounter();
 
 const App = () => {
-  const [playerInputs, setPlayerInputs] = useState(Array(6).fill().map(() => ({ cards: [], score: 0, active: false })));
+  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], score: 0, active: false })));
   const [dealerCards, setDealerCards] = useState([]);
   const [counts, setCounts] = useState(counter.getCurrentCount());
   const [recommendation, setRecommendation] = useState('');
@@ -87,7 +87,7 @@ const App = () => {
   };
 
   const startNewRound = () => {
-    setPlayerInputs(Array(6).fill().map(() => ({ cards: [], score: 0, active: false })));
+    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], score: 0, active: false })));
     setDealerCards([]);
     setRecommendation('');
     updateAndDisplayCount();
@@ -128,18 +128,18 @@ const PlayerInput = ({ index, data, addCard, setPlayer }) => {
   return (
     <div className={`form-group ${data.active ? 'active' : 'inactive'}`} id={`player${index}`}>
       <label htmlFor={`player${index}Cards`}>Player {index} Cards</label>
-      <div id={`player${index}Cards`} className="card-container">
+      <div id={`player${index}Cards`} className={`card-container ${data.active ? '' : 'hidden'}`}>
         {data.cards.map((card, i) => (
           <span key={i} className="card">{card}</span>
         ))}
       </div>
       <p id={`player${index}Score`}>Score: {data.score}</p>
-      <div className="card-buttons" id={`player${index}CardButtons`}>
+      <div className={`card-buttons ${data.active ? '' : 'hidden'}`} id={`player${index}CardButtons`}>
         {['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].map(card => (
           <button key={card} onClick={() => addCard(`player${index}Cards`, card)}>{card}</button>
         ))}
       </div>
-      <div id={`player${index}Split`} className="split-container"></div>
+      <div id={`player${index}Split`} className={`split-container ${data.active ? '' : 'hidden'}`}></div>
       <button type="button" className="btn set-player-btn" onClick={() => setPlayer(index - 1)}>Set Player</button>
     </div>
   );
