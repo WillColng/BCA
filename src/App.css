@@ -6,7 +6,7 @@ html, body {
     width: 100%;
     background: #2c3e50;
     color: #ecf0f1;
-    overflow: hidden; /* Убираем прокрутку для body */
+    overflow: hidden;
 }
 
 body {
@@ -29,13 +29,16 @@ body {
     flex-direction: column;
     align-items: center;
     transition: all 0.3s ease;
-    position: relative; /* Добавлено для размещения кнопок в верхнем правом углу */
+    position: relative;
 }
 
 .top-right-buttons {
     position: absolute;
     top: 10px;
     right: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .top-left-count {
@@ -43,16 +46,16 @@ body {
     top: 10px;
     left: 10px;
     display: flex;
-    gap: 10px; /* Добавлен промежуток между элементами */
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     width: 100%;
-    direction: rtl;
-    margin-top: 60px; /* Добавлен отступ сверху */
+    margin-top: 60px;
 }
 
 .grid-container > .form-group {
