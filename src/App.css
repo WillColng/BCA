@@ -52,15 +52,17 @@ body {
 .grid-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;  /* Center the content */
+    justify-content: flex-end;
     width: 100%;
     margin-top: 60px;
     gap: 10px;
+    direction: rtl;
 }
 
 .grid-container > .form-group {
     flex: 1 1 150px;
     min-width: 150px;
+    direction: ltr;
 }
 
 .inactive {

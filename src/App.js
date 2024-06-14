@@ -95,8 +95,6 @@ const App = () => {
     setPlayerInputs(Array(7).fill().map(() => ({ cards: [], score: 0, active: false, mySeat: false })));
     setDealerCards([]);
     setRecommendation('');
-    counter.reset();
-    updateAndDisplayCount();
   };
 
   const newShuffle = () => {
@@ -147,10 +145,10 @@ const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSe
       </div>
       <div id={`player${index}Split`} className={`split-container ${data.active ? '' : 'hidden'}`}></div>
       {!data.active && !data.mySeat && <button type="button" className="btn set-player-btn" onClick={() => setPlayer(index - 1)}>Set Player</button>}
-      {data.active && !data.mySeat && (
+      {data.active && (
         <>
           <button type="button" className="btn deactivate-btn" onClick={() => deactivatePlayer(index - 1)}>Deactivate</button>
-          <button type="button" className="btn take-seat-btn" onClick={() => takeSeat(index - 1)}>Take Seat</button>
+          {!data.mySeat && <button type="button" className="btn take-seat-btn" onClick={() => takeSeat(index - 1)}>Take Seat</button>}
         </>
       )}
       {data.mySeat && <p className="my-seat">My Seat</p>}
