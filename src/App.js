@@ -45,7 +45,7 @@ class WongHalvesCounter {
 const counter = new WongHalvesCounter();
 
 const App = () => {
-  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], splitCards: [], score: 0, active: false, mySeat: false })));
+  const [playerInputs, setPlayerInputs] = useState(Array(7).fill().map(() => ({ cards: [], splitCards: [], active: false, mySeat: false })));
   const [dealerCards, setDealerCards] = useState([]);
   const [counts, setCounts] = useState(counter.getCurrentCount());
   const [recommendation, setRecommendation] = useState('');
@@ -60,7 +60,7 @@ const App = () => {
   };
 
   const deactivatePlayer = (index) => {
-    const newInputs = playerInputs.map((input, i) => i === index ? { cards: [], splitCards: [], score: 0, active: false, mySeat: false } : input);
+    const newInputs = playerInputs.map((input, i) => i === index ? { ...input, active: false, mySeat: false } : input);
     setPlayerInputs(newInputs);
   };
 
@@ -70,25 +70,23 @@ const App = () => {
   };
 
   const addCard = (containerId, card) => {
-    if (containerId.startsWith('player')) {
-      const parts = containerId.split('_');
-      const index = parseInt(parts[0].replace('player', ''), 10) - 1;
-      const splitIndex = parts.length > 1 ? parseInt(parts[1], 10) : null;
+    const parts = containerId.split('_');
+    const index = parseInt(parts[0].replace('player', ''), 10) - 1;
+    const splitIndex = parts.length > 1 ? parseInt(parts[1], 10) : null;
 
-      const newInputs = playerInputs.map((input, i) => {
-        if (i === index) {
-          if (splitIndex !== null) {
-            const newSplitCards = input.splitCards.map((split, j) => j === splitIndex ? [...split, card] : split);
-            return { ...input, splitCards: newSplitCards };
-          }
-          return { ...input, cards: [...input.cards, card] };
+    const newInputs = playerInputs.map((input, i) => {
+      if (i === index) {
+        if (splitIndex !== null) {
+          const newSplitCards = input.splitCards.map((split, j) => j === splitIndex ? [...split, card] : split);
+          return { ...input, splitCards: newSplitCards };
         }
-        return input;
-      });
-      setPlayerInputs(newInputs);
-    } else if (containerId === 'dealerCardContainer') {
-      setDealerCards([...dealerCards, card]);
-    }
+        return { ...input, cards: [...input.cards, card] };
+      }
+      return input;
+    });
+
+    setPlayerInputs(newInputs);
+    updateAndDisplayCount(newInputs, dealerCards);
   };
 
   const splitCards = (index) => {
@@ -104,10 +102,8 @@ const App = () => {
   const updateAndDisplayCount = () => {
     counter.reset();
     playerInputs.forEach(input => {
-      if (input.active) {
-        counter.updateCount(input.cards);
-        input.splitCards.forEach(split => counter.updateCount(split));
-      }
+      counter.updateCount(input.cards);
+      input.splitCards.forEach(split => counter.updateCount(split));
     });
     counter.updateCount(dealerCards);
     setCounts(counter.getCurrentCount());
@@ -115,15 +111,15 @@ const App = () => {
   };
 
   const startNewRound = () => {
-    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], splitCards: [], score: 0, active: false, mySeat: false })));
+    setPlayerInputs(Array(7).fill().map(() => ({ cards: [], splitCards: [], active: false, mySeat: false })));
     setDealerCards([]);
     setRecommendation('');
+    updateAndDisplayCount();
   };
 
   const newShuffle = () => {
     counter.reset();
     startNewRound();
-    updateAndDisplayCount();
   };
 
   const generateRecommendation = () => {
@@ -175,7 +171,7 @@ const PlayerInput = ({ index, data, addCard, setPlayer, deactivatePlayer, takeSe
       <p id={`player${index}Score`}>Score: {data.score}</p>
       <div className={`card-buttons ${data.active ? '' : 'hidden'}`} id={`player${index}CardButtons`}>
         {['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].map(card => (
-          <button key={card} onClick={() => addCard(`player${index}Cards`, card)}>{card}</button>
+          <button key={card} onClick={() => addCard(`player${index}`, card)}>{card}</button>
         ))}
       </div>
       <div id={`player${index}Split`} className={`split-container ${data.active ? '' : 'hidden'}`}>
